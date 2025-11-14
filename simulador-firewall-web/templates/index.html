@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Firewall - Filtro de Pacotes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🧱 Simulador de Firewall</h1>
+                <p class="subtitle">Filtro de Pacotes</p>
+                <p class="timestamp">📅 {{ data_hora }}</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Seção de Formulário de Teste -->
+            <section class="form-section">
+                <h2>Testar Pacote</h2>
+                <form id="formTeste" class="form-teste">
+                    <div class="form-group">
+                        <label for="ip">IP de Destino:</label>
+                        <input type="text" id="ip" name="ip" placeholder="Ex: 8.8.8.8" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="porta">Porta:</label>
+                        <input type="number" id="porta" name="porta" placeholder="Ex: 80" min="1" max="65535" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
+            </section>
+
+            <!-- Seção de Estatísticas -->
+            <section class="stats-section">
+                <h2>📊 Estatísticas das Regras</h2>
+                <div class="stats-container">
+                    <div class="stat-card permitido">
+                        <span class="icon">✅</span>
+                        <span class="label">Permitidos:</span>
+                        <span class="value" id="statPermitidos">{{ stats.permitidos }}</span>
+                    </div>
+                    <div class="stat-card bloqueado">
+                        <span class="icon">❌</span>
+                        <span class="label">Bloqueados:</span>
+                        <span class="value" id="statBloqueados">{{ stats.bloqueados }}</span>
+                    </div>
+                    <div class="stat-card total">
+                        <span class="icon">📦</span>
+                        <span class="label">Total:</span>
+                        <span class="value" id="statTotal">{{ stats.total }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção de Regras Configuradas -->
+            <section class="rules-section">
+                <div class="rules-header">
+                    <h2>📋 Regras Configuradas</h2>
+                    <button class="btn btn-secondary" id="btnAdicionarRegra">+ Adicionar Regra</button>
+                </div>
+                
+                {% if regras %}
+                <div class="rules-table-container">
+                    <table class="rules-table">
+                        <thead>
+                            <tr>
+                                <th>IP</th>
+                                <th>Porta</th>
+                                <th>Ação</th>
+                                <th>Descrição</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="regrasTableBody">
+                            {% for regra in regras %}
+                            <tr class="regra-row" data-index="{{ loop.index0 }}">
+                                <td class="ip">{{ regra.ip }}</td>
+                                <td class="porta">{{ regra.porta }}</td>
+                                <td class="acao">
+                                    <span class="badge {% if regra.acao == 'PERMITIDO' %}badge-permitido{% else %}badge-bloqueado{% endif %}">
+                                        {{ regra.acao }}
+                                    </span>
+                                </td>
+                                <td class="descricao">{{ regra.get('descricao', '-') }}</td>
+                                <td class="acoes">
+                                    <button class="btn-icon btn-edit" title="Editar">✏️</button>
+                                    <button class="btn-icon btn-delete" title="Deletar">🗑️</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-message">Nenhuma regra configurada</p>
+                {% endif %}
+            </section>
+
+            <!-- Seção de Testes Realizados -->
+            <section class="tests-section">
+                <div class="tests-header">
+                    <h2>🔍 Testes Realizados</h2>
+                    <button class="btn btn-secondary" id="btnLimparTestes">Limpar Histórico</button>
+                </div>
+                
+                <div id="testesContainer" class="testes-container">
+                    {% if testes %}
+                        {% for teste in testes %}
+                        <div class="teste-card">
+                            <div class="teste-header">
+                                <span class="teste-ip">{{ teste.ip }}:{{ teste.porta }}</span>
+                                <span class="teste-servico">{{ teste.servico }}</span>
+                                <span class="teste-timestamp">{{ teste.timestamp }}</span>
+                            </div>
+                            <div class="teste-body">
+                                <div class="teste-conectividade">
+                                    {% if teste.conectividade is none %}
+                                    <span class="icon">⚠️</span> Host não encontrado
+                                    {% elif teste.conectividade %}
+                                    <span class="icon">✓</span> Porta ABERTA
+                                    {% else %}
+                                    <span class="icon">✗</span> Porta FECHADA
+                                    {% endif %}
+                                </div>
+                                <div class="teste-decisao {% if teste.decisao == 'PERMITIDO' %}permitido{% else %}bloqueado{% endif %}">
+                                    {% if teste.decisao == 'PERMITIDO' %}
+                                    <span class="icon">✅</span> PERMITIDO
+                                    {% else %}
+                                    <span class="icon">❌</span> BLOQUEADO
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="empty-message">Nenhum teste realizado ainda</p>
+                    {% endif %}
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Regra -->
+    <div id="modalRegra" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Adicionar Regra</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="formRegra" class="form-regra">
+                <div class="form-group">
+                    <label for="modalIp">IP:</label>
+                    <input type="text" id="modalIp" placeholder="Ex: 192.168.1.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalPorta">Porta:</label>
+                    <input type="number" id="modalPorta" placeholder="Ex: 80" min="1" max="65535" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalAcao">Ação:</label>
+                    <select id="modalAcao" required>
+                        <option value="">Selecione...</option>
+                        <option value="PERMITIDO">PERMITIDO</option>
+                        <option value="BLOQUEADO">BLOQUEADO</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="modalDescricao">Descrição (opcional):</label>
+                    <input type="text" id="modalDescricao" placeholder="Ex: Google DNS">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancelar">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

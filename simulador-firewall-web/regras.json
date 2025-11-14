@@ -1,0 +1,22 @@
+[
+  {
+    "ip": "8.8.8.8",
+    "porta": 53,
+    "acao": "BLOQUEADO"
+  },
+  {
+    "ip": "192.168.0.10",
+    "porta": 80,
+    "acao": "PERMITIDO"
+  },
+  {
+    "ip": "10.0.0.5",
+    "porta": 22,
+    "acao": "BLOQUEADO"
+  },
+  {
+    "ip": "1.1.1.1",
+    "porta": 443,
+    "acao": "PERMITIDO"
+  }
+]
