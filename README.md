@@ -346,14 +346,6 @@ python -m unittest test_firewall -v
 | Endpoints API | 7 |
 | Funções documentadas | 100% |
 
-## 📖 Documentação Adicional
-
-Arquivos de documentação inclusos:
-
-- **FUNCIONALIDADES.md** - Lista detalhada de todas as funcionalidades
-- **GUIA_PASSO_A_PASSO.md** - Guia completo para executar e testar
-- **RESUMO_FUNCIONALIDADES.txt** - Resumo rápido
-
 ## 🎓 Conceitos Demonstrados
 
 - Arquitetura cliente-servidor
@@ -378,14 +370,7 @@ Possíveis melhorias futuras:
 5. **Modo escuro/claro**
 6. **Suporte a múltiplos usuários**
 
-## 📄 Licença
-
-Este projeto é de código aberto e pode ser usado livremente para fins educacionais.
-
----
-
 <img width="1536" height="1024" alt="tela 1" src="https://github.com/user-attachments/assets/2654889a-de31-401c-9d7f-488b4951eed2" />
 <img width="1280" height="1080" alt="tela 2" src="https://github.com/user-attachments/assets/380e90f8-4e6b-4919-83d8-a935a0f3bf2b" />
 <img width="1024" height="1536" alt="tela 3" src="https://github.com/user-attachments/assets/011f2b87-0141-4911-b711-febac8953cf5" />
 
-**Desenvolvido com ❤️ para fins educacionais**
